@@ -1,0 +1,100 @@
+import pandas as pd
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.metrics.pairwise import linear_kernel
+
+from surprise import Dataset, Reader, SVD
+
+from surprise.model_selection import train_test_split
+
+#Load movies dataset (movieId, title, genres)
+
+movies pd.read_csv('movies.csv')
+
+# Load ratings dataset (userId, movield, rating)
+
+ratings = pd.read_csv('ratings.csv')
+
+# Content-Based Filtering Part
+
+#TF-IDF Vectorizer for genres
+
+tfidf TfidfVectorizer (stop_words='english')
+
+movies['genres'] = movies['genres'].fillna()
+
+tfidf_matrix = tfidf.fit_transform(movies['genres'])
+
+# Compute cosine similarity matrix
+
+cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+
+#Build a reverse map of movie titles to indices
+
+indices = pd.Series(movies.index, index-movies['title']).drop_duplicates()
+
+def content based_recommendations (title, cosine_sim-cosine_sim):
+
+idx indices [title]
+
+sim_scores = list(enumerate(cosine_sim[idx]))
+
+sim_scores = sorted(sim_scores, key-lambda x: x[1], reverse=True)
+
+sim_scores = sim_scores [1:11]
+
+movie_indices = [i[0] for i in sim_scores]
+
+return movies['title'].iloc[movie_indices]
+
+# Example usage
+
+print("Content-based recommendations for 'The Lion King":")
+
+print(content_based_recommendations (The Lion King'))
+
+# Example prediction
+
+print("\nPredicted rating (User 1, Movie 1):", predict_rating(1, 1))
+
+# Hybrid: Recommend top movies by predicted rating
+
+def hybrid_recommendations (user_id, top_n=10):
+
+user_seen = ratings [ratings['userId'] == user_id] ['movieId'].tolist()
+unseen movies[movies['movieId"].isin(user_seen)]
+
+unseen['predicted_rating'] unseen['movield'].apply(lambda x: predict_rating(user_id, x))
+
+top_recs = unseen.sort_values(predicted rating, ascending=False).head(top_n)
+
+return top_recs[['title', 'predicted_rating']]
+
+print("\nHybrid recommendations for User 11")
+
+print(hybrid_recommendations(1))
+
+# Collaborative Filtering Part
+
+#Define Reader and load data
+
+reader Reader(rating_scale-(0.5, 5.80))
+
+data Dataset.load_from_df(ratings [['userId", 'movieId", "rating ]], reader)
+
+#Train-test split
+
+trainset, testset train_test_split(data, test size=0.2)
+
+#Use SVD for collaborative filtering
+
+svd - SVD()
+
+svd.fit (trainset)
+
+def predict_rating(user_id, movie_id):
+
+pred svd.predict(user_id, movie_id)
+
+return pred.est
